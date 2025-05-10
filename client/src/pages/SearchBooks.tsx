@@ -33,6 +33,10 @@ const SearchBooks = () => {
     return () => saveBookIds(savedBookIds);
   });
 
+// Todo: implement handleFormSubmit to prevent default, check searchInput, fetch books with searchGoogleBooks, handle errors, map API items to bookData, update searchedBooks state and clear input
+// Note logs the fetched ‘items’ and mapped ‘bookData’, defaults missing authors to ['No author to display'], picks thumbnail or empty string, then calls setSearchedBooks(bookData) and resets searchInput, with errors caught and logged
+
+
   // create method to search for books and set state on form submit
   const handleFormSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
