@@ -65,6 +65,8 @@ const resolvers = {
             throw new Error("You need to be logged in!");
         },
 
+// Todo: implement deleteBook resolver to remove book from savedBooks by bookId using $pull
+// Note checks for context.user, uses User.findOneAndUpdate({ _id: context.user._id }, { $pull: { savedBooks: { bookId } } }, { new: true }), returns updated user, and throws if not authenticated
 
 
         deleteBook: async (_parent: any, { bookId }: any, context: any) => {
