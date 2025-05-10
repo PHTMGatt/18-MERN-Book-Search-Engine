@@ -25,18 +25,36 @@ export const authenticateToken = ({ req }:{req: Request}) => {
     return req;
   }
 
-  if (authHeader) {
+// Idea Toggle: authHeader 2
+
+  // if (authHeader) {
+  //   const token = authHeader.split(' ')[1];
+
+  //   const secretKey = process.env.JWT_SECRET_KEY || '';
+
+  //   try {
+  //     const user = jwt.verify(token, secretKey) as JwtPayload;
+  //     req.user = user;
+  //   } catch (err) {
+  //     console.error('Token verification error: ', err);
+  //     return req;
+  //   }
+  // } 
+
+  // Idea Toggle: authHeader 1
+   if (authHeader) {
     const token = authHeader.split(' ')[1];
 
     const secretKey = process.env.JWT_SECRET_KEY || '';
 
-    try {
-      const user = jwt.verify(token, secretKey) as JwtPayload;
-      req.user = user;
-    } catch (err) {
-      console.error('Token verification error: ', err);
-      return req;
-    }
+    jwt.verify(token, secretKey, (err, user) => {
+      if (err) {
+        console.error('Token verification error: ', err);
+        return req;
+      }
+
+      req.user = user as JwtPayload;
+    });
   } 
 
   return req;
