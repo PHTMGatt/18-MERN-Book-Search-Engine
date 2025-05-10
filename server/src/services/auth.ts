@@ -42,7 +42,6 @@ export const authenticateToken = ({ req }:{req: Request}) => {
   // } 
 
   // Idea Toggle: authHeader 1
-   if (authHeader) {
     const token = authHeader.split(' ')[1];
 
     const secretKey = process.env.JWT_SECRET_KEY || '';
@@ -54,10 +53,9 @@ export const authenticateToken = ({ req }:{req: Request}) => {
       }
 
       req.user = user as JwtPayload;
+      return req;
     });
-  } 
 
-  return req;
 };
 
 export const signToken = (username: string, email: string, _id: unknown) => {
