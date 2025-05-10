@@ -72,6 +72,10 @@ const SearchBooks = () => {
     }
   };
 
+// Todo: implement handleSaveBook to locate book by 'bookId' in 'searchedBooks', retrieve auth token, call 'saveBook' mutation with { variables: { bookData: ... } }, and update 'savedBookIds'
+// Note finds 'bookToSave' via searchedBooks.find, gets token from Auth.loggedIn()/Auth.getToken(), returns false if no token, executes saveBook({ variables: { bookData } }), destructures { data }, appends bookToSave.bookId to savedBookIds, and logs errors
+
+
   // create function to handle saving a book to our database
   const handleSaveBook = async (bookId: string) => {
     // find the book in `searchedBooks` state by the matching id

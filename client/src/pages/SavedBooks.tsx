@@ -9,6 +9,7 @@ import { removeBookId } from '../utils/localStorage';
 //import type { User } from '../models/User';
 
 const SavedBooks = () => {
+
 /*  const [userData, setUserData] = useState<User>({
     username: '',
     email: '',
@@ -16,9 +17,9 @@ const SavedBooks = () => {
     savedBooks: [],
   });
   */
-
-  // use this to determine if `useEffect()` hook needs to run again
- // const userDataLength = Object.keys(userData).length;
+ 
+// use this to determine if `useEffect()` hook needs to run again
+// const userDataLength = Object.keys(userData).length;
 
   const { loading, data, error } = useQuery(GET_ME);
   const user = data?.getMe || {};
@@ -26,7 +27,7 @@ const SavedBooks = () => {
   const [deleteBook] = useMutation(DELETE_BOOK);
 
 
-/* useeffects
+/* Idea UseEffects
   useEffect(() => {
     const getUserData = async () => {
       try {
