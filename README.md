@@ -8,8 +8,7 @@
 ## 🔗 Live Demo & Repo +
 
 - **Live Demo:** https://your-render-url.onrender.com  
-- **GitHub Repo:** https://github.com/PHTMGatt/18-MERN-Book-Search-Engine  
-- **Img:** [Book Search Img](./Assets/book-search-home.png)
+- **GitHub Repo:** https://github.com/PHTMGatt/18-MERN-Book-Search-Engine 
 
 
 
