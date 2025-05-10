@@ -14,10 +14,6 @@
 
 ## 🛠 Tech Stack
 
-<table>
-  <tr>
-    <td>
-
 | Layer      | Technology                        |
 | ---------- | --------------------------------- |
 | Front‑end  | React, Apollo Client, TypeScript  |
@@ -26,15 +22,6 @@
 | Auth       | JWT, Context Middleware           |
 | Deployment | Render                            |
 
-    </td>
-    <td>
-
-<img src="./Assets/HW18RMSS.png" width="300" alt="Tech Stack Wireframe" />
-
-    </td>
-  </tr>
-</table>
-
 ---
 
 ## ✨ Features
@@ -42,7 +29,7 @@
 - **Book Search** — query the Google Books API for titles, authors, descriptions, covers & links  
 - **User Auth** — signup/login with JWT stored in HTTP headers via Apollo Context  
 - **Save & Remove** — persist your favorites in a MongoDB collection  
-- **GraphQL API** — built with Apollo Server on Express  
+- **GraphQL API** — built with Apollo Server over Express  
 - **Apollo Client** — attaches token via `authLink` middleware  
 - **Responsive UI** — modern React interface with modal forms  
 - **Deployed** — live on Render backed by MongoDB Atlas  
@@ -62,8 +49,8 @@
   - Verifies JWT; attaches decoded `user` payload to GraphQL context  
 
 - **Schemas/**  
-  - **typeDefs.ts** — GraphQL schema: `Book`, `User`, `Auth`, input `BookInput`, `getMe` query, `addUser/login/saveBook/deleteBook` mutations  
-  - **resolvers.ts** — resolver functions for user auth, `$addToSet`, `$pull`, and data fetching  
+  - **typeDefs.ts**: defines `Book`, `User`, `Auth`, `BookInput`, `getMe` query & `addUser`/`login`/`saveBook`/`deleteBook` mutations  
+  - **resolvers.ts**: implements user creation/auth, `$addToSet` for saving books, `$pull` for deleting books, and returns updated `User`  
 
 ---
 
@@ -71,24 +58,24 @@
 
 - **App.tsx**  
   - Wraps the app in `<ApolloProvider>` with `InMemoryCache` & `authLink`  
-  - Configures React Router for navigation  
+  - Sets up React Router for navigation  
 
-- **queries.ts** / **mutations.ts**  
-  - GraphQL operations: `GET_ME`, `LOGIN_USER`, `ADD_USER`, `SAVE_BOOK`, `REMOVE_BOOK`  
+- **queries.ts / mutations.ts**  
+  - `GET_ME`, `LOGIN_USER`, `ADD_USER`, `SAVE_BOOK`, `REMOVE_BOOK`  
 
 - **SearchBooks.tsx**  
-  - Form for querying Google Books API  
-  - Uses `useMutation(SAVE_BOOK)` to save selected books  
+  - Fetches from Google Books on form submit  
+  - Uses `useMutation(SAVE_BOOK)` to add books  
 
 - **SavedBooks.tsx**  
   - Uses `useQuery(GET_ME)` to load saved books  
-  - Uses `useMutation(REMOVE_BOOK)` to remove saved books  
+  - Uses `useMutation(REMOVE_BOOK)` to remove books  
 
-- **SignupForm.tsx** / **LoginForm.tsx**  
-  - Modal components wired to `ADD_USER` & `LOGIN_USER` mutations  
+- **SignupForm.tsx / LoginForm.tsx**  
+  - Modal forms wired to `ADD_USER` & `LOGIN_USER` mutations  
 
 ---
 
 ## 📄 License
 
-© 2024 edX Boot Camps LLC. Confidential & Proprietary. All Rights Reserved.
+© 2024 edX Boot Camps LLC. Confidential & Proprietary. All Rights Reserved.  
