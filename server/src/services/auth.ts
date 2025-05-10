@@ -25,37 +25,18 @@ export const authenticateToken = ({ req }:{req: Request}) => {
     return req;
   }
 
-// Idea Toggle: authHeader 2
+  const token = authHeader.split(' ')[1];
+  const secretKey = process.env.JWT_SECRET_KEY || '';
 
-  // if (authHeader) {
-  //   const token = authHeader.split(' ')[1];
+  try {
+    const user = jwt.verify(token, secretKey) as JwtPayload;
+    req.user = user;
+  } catch (err) {
+    console.error('Token verification error: ', err);
+    return req;
+  }
 
-  //   const secretKey = process.env.JWT_SECRET_KEY || '';
-
-  //   try {
-  //     const user = jwt.verify(token, secretKey) as JwtPayload;
-  //     req.user = user;
-  //   } catch (err) {
-  //     console.error('Token verification error: ', err);
-  //     return req;
-  //   }
-  // } 
-
-  // Idea Toggle: authHeader 1
-    const token = authHeader.split(' ')[1];
-
-    const secretKey = process.env.JWT_SECRET_KEY || '';
-
-    jwt.verify(token, secretKey, (err, user) => {
-      if (err) {
-        console.error('Token verification error: ', err);
-        return req;
-      }
-
-      req.user = user as JwtPayload;
-      return req;
-    });
-
+  return req;
 };
 
 export const signToken = (username: string, email: string, _id: unknown) => {
