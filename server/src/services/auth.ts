@@ -30,14 +30,13 @@ export const authenticateToken = ({ req }:{req: Request}) => {
 
     const secretKey = process.env.JWT_SECRET_KEY || '';
 
-    jwt.verify(token, secretKey, (err, user) => {
-      if (err) {
-        console.error('Token verification error: ', err);
-        return req;
-      }
-
-      req.user = user as JwtPayload;
-    });
+    try {
+      const user = jwt.verify(token, secretKey) as JwtPayload;
+      req.user = user;
+    } catch (err) {
+      console.error('Token verification error: ', err);
+      return req;
+    }
   } 
 
   return req;
