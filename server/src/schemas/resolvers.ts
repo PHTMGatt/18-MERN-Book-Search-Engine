@@ -14,6 +14,10 @@ const resolvers = {
         }
     },
 
+// Todo: implement 'addUser' resolver to log 'args', destructure 'username', 'email', 'password', create User, generate JWT via 'signToken', and return { token, user }
+// Note logs incoming 'args', validates input by extracting 'username', 'email', 'password' from args, calls User.create({ username, email, password }), uses signToken(user.username, user.email, user._id), and returns the new 'token' and 'user'
+
+
     Mutation: {
         addUser: async (_parent: any, args: any, _context: any) => {
             console.log("addUser args", args);
@@ -25,6 +29,7 @@ const resolvers = {
             const token = signToken(user.username, user.email, user._id);
             return { token, user };
         },
+
         login: async (_parent: any, args: any, _context: any) => {
            const user = await User.findOne({ email: args.email });
             if (!user) {
