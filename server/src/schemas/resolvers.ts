@@ -6,11 +6,18 @@ import { signToken } from "../services/auth.js";
 const resolvers = {
     Query: {
         getMe: async (_parent: any, _args: any, context: any) => {
+            console.log("getMe context", context);
             if (context.user) {
-                const user = await User.findById(context.user._id).select("-__v -password").populate("savedBooks");
+                let user;
+                try {
+                    user = await User.findById(context.user._id).select("-__v -password").populate("savedBooks");
+                } catch (error) {
+                    console.log("Err: ", error);
+                    throw new Error("You need to be logged in!");
+                }
                 return user;
             }
-            throw new Error("You need to be logged in!");
+            return null;
         }
     },
 

@@ -16,9 +16,9 @@ interface JwtPayload {
 // Idea Research: export const authenticateToken = (req: Request) =>
 
 export const authenticateToken = ({ req }:{req: Request}) => {
-  console.log('headers: ', req.headers);
+//  console.log('headers: ', req.headers);
   const authHeader = req.headers.authorization;
-  console.log('authHeader: ', authHeader);
+//  console.log('authHeader: ', authHeader);
 
   if(!authHeader) {
     console.error('No authorization header found'); 
@@ -30,6 +30,7 @@ export const authenticateToken = ({ req }:{req: Request}) => {
 
   try {
     const user = jwt.verify(token, secretKey) as JwtPayload;
+    console.log('user: ', user);
     req.user = user;
   } catch (err) {
     console.error('Token verification error: ', err);
