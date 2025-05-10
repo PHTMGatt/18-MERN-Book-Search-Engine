@@ -14,6 +14,10 @@ const httpLink = createHttpLink({
   uri: '/graphql',
 });
 
+// Todo: set up HTTP link to 'uri: /graphql', build authLink middleware to attach JWT from localStorage as Bearer token, and initialize ApolloClient with authLink.concat(httpLink)
+// Note uses createHttpLink({ uri: '/graphql' }), setContext to retrieve 'id_token' from localStorage (logged as 'token'), merges it into headers.authorization, then configures ApolloClient with the combined link and InMemoryCache
+
+
 // Construct request middleware that will attach the JWT token to every request as an `authorization` header
 const authLink = setContext((_, { headers }) => {
   // get the authentication token from local storage if it exists
