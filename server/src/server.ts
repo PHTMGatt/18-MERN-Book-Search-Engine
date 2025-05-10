@@ -12,6 +12,10 @@ const server = new ApolloServer({
   resolvers,
 });
 
+// Todo: initialize ApolloServer and Express app—add urlencoded/json parsers, serve static assets in production, mount '/graphql' route with authenticateToken context, and start listening on PORT
+// Note sets up express.urlencoded({ extended: true }) and express.json(), conditionally serves client/dist in production, uses expressMiddleware(server, { context: authenticateToken }), and logs the server URL on startup
+
+
 const app = express();
 const PORT = process.env.PORT || 3001;
 
