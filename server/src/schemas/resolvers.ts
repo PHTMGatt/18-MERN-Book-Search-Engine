@@ -49,8 +49,8 @@ const resolvers = {
             return { token, user };
         },
 
-// Todo: implement 'saveBook' resolver to use '$addToSet' to add bookData to 'savedBooks' and return updated user
-// Note checks for context.user, calls User.findOneAndUpdate({ _id: context.user._id }, { $addToSet: { savedBooks: args.bookData } }, { new: true, runValidators: true }), and throws error if not authenticated
+        // Todo: implement 'saveBook' resolver to use '$addToSet' to add bookData to 'savedBooks' and return updated user
+        // Note checks for context.user, calls User.findOneAndUpdate({ _id: context.user._id }, { $addToSet: { savedBooks: args.bookData } }, { new: true, runValidators: true }), and throws error if not authenticated
 
 
         saveBook: async (_parent: any, args: any, context: any) => {
@@ -65,8 +65,8 @@ const resolvers = {
             throw new Error("You need to be logged in!");
         },
 
-// Todo: implement deleteBook resolver to remove book from savedBooks by bookId using $pull
-// Note checks for context.user, uses User.findOneAndUpdate({ _id: context.user._id }, { $pull: { savedBooks: { bookId } } }, { new: true }), returns updated user, and throws if not authenticated
+        // Todo: implement deleteBook resolver to remove book from savedBooks by bookId using $pull
+        // Note checks for context.user, uses User.findOneAndUpdate({ _id: context.user._id }, { $pull: { savedBooks: { bookId } } }, { new: true }), returns updated user, and throws if not authenticated
 
 
         deleteBook: async (_parent: any, { bookId }: any, context: any) => {

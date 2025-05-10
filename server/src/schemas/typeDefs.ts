@@ -1,6 +1,10 @@
 import { gql } from 'graphql-tag';
 
 
+// Todo: define GraphQL schema typeDefs with types 'Book', 'User', 'Auth', input 'BookInput', Query 'getMe', and Mutation 'addUser', 'login', 'saveBook', 'deleteBook'
+// Note Book type holds bookId, authors, description, image, link, title; User holds _id, username, email, bookCount, savedBooks [Book]; Auth wraps token and user; BookInput matches saveBook fields; Query getMe returns current user; Mutations map to resolver functions
+
+
 const typeDefs = gql`
 
     type Book {
