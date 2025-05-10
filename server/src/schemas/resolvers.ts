@@ -30,6 +30,10 @@ const resolvers = {
             return { token, user };
         },
 
+// Todo: implement login resolver to find user by email, verify password, generate JWT, and return token & user
+// Note uses User.findOne({ email: args.email }) and throws if no user, calls user.isCorrectPassword(args.password) and throws on bad credentials, then uses signToken(user.username, user.password, user._id) to create the token
+
+
         login: async (_parent: any, args: any, _context: any) => {
            const user = await User.findOne({ email: args.email });
             if (!user) {
