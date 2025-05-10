@@ -14,8 +14,8 @@ const resolvers = {
         }
     },
 
-// Todo: implement 'addUser' resolver to log 'args', destructure 'username', 'email', 'password', create User, generate JWT via 'signToken', and return { token, user }
-// Note logs incoming 'args', validates input by extracting 'username', 'email', 'password' from args, calls User.create({ username, email, password }), uses signToken(user.username, user.email, user._id), and returns the new 'token' and 'user'
+    // Todo: implement 'addUser' resolver to log 'args', destructure 'username', 'email', 'password', create User, generate JWT via 'signToken', and return { token, user }
+    // Note logs incoming 'args', validates input by extracting 'username', 'email', 'password' from args, calls User.create({ username, email, password }), uses signToken(user.username, user.email, user._id), and returns the new 'token' and 'user'
 
 
     Mutation: {
@@ -30,25 +30,29 @@ const resolvers = {
             return { token, user };
         },
 
-// Todo: implement login resolver to find user by email, verify password, generate JWT, and return token & user
-// Note uses User.findOne({ email: args.email }) and throws if no user, calls user.isCorrectPassword(args.password) and throws on bad credentials, then uses signToken(user.username, user.password, user._id) to create the token
-
+        // Todo: implement login resolver to find user by email, verify password, generate JWT, and return token & user
+        // Note uses User.findOne({ email: args.email }) and throws if no user, calls user.isCorrectPassword(args.password) and throws on bad credentials, then uses signToken(user.username, user.password, user._id) to create the token
 
         login: async (_parent: any, args: any, _context: any) => {
-           const user = await User.findOne({ email: args.email });
+            const user = await User.findOne({ email: args.email });
             if (!user) {
                 throw new Error("Can't find this user");
             }
-            
+
             const correctPw = await user.isCorrectPassword(args.password);
-            
+
             if (!correctPw) {
                 throw new Error("Bad Authentication credentials");
-               
+
             }
             const token = signToken(user.username, user.password, user._id);
             return { token, user };
         },
+
+// Todo: implement 'saveBook' resolver to use '$addToSet' to add bookData to 'savedBooks' and return updated user
+// Note checks for context.user, calls User.findOneAndUpdate({ _id: context.user._id }, { $addToSet: { savedBooks: args.bookData } }, { new: true, runValidators: true }), and throws error if not authenticated
+
+
         saveBook: async (_parent: any, args: any, context: any) => {
             if (context.user) {
                 const updatedUser = await User.findOneAndUpdate(
@@ -60,10 +64,13 @@ const resolvers = {
             }
             throw new Error("You need to be logged in!");
         },
+
+
+
         deleteBook: async (_parent: any, { bookId }: any, context: any) => {
             if (context.user) {
                 const updatedUser = await User.findOneAndUpdate(
-                    { _id: context.user._id },  
+                    { _id: context.user._id },
                     { $pull: { savedBooks: { bookId } } },
                     { new: true }
                 );
