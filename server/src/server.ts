@@ -1,4 +1,5 @@
 import express from 'express';
+import type { Request, Response } from 'express';
 import { ApolloServer } from '@apollo/server';
 import path from 'node:path';
 import db from './config/connection.js';
@@ -29,15 +30,20 @@ const startApolloServer = async () => {
   app.use(express.urlencoded({ extended: true }));
   app.use(express.json());
   
-  // if we're in production, serve client/build as static assets
-  if (process.env.NODE_ENV === 'production') {
-    app.use(express.static(path.join(__dirname, '../client/dist')));
-  }
   
-  //app.use(routes);
+  // Note - WE remove the original RESTful API routes, and we update the HTTP METHOD and endpoint/address to use our NEW APOLLO graphql (setup) POST:METHOD and '/graphql' endpoint or address
+  //app.use(routes);  // original RESTful API routes  --> fetch requests to '/api' endpoint
   app.use('/graphql', expressMiddleware(server, {
     context: authenticateToken as any
   }));
+  // if we're in production, serve client/build as static assets
+  if (process.env.NODE_ENV === 'production') {
+    app.use(express.static(path.join(__dirname, '../client/dist')));
+
+    app.get('*', (_req: Request, res: Response) => {
+      res.sendFile(path.join(__dirname, '../client/dist/index.html'));
+    });
+  }
   
   app.listen(PORT, () => console.log(`🌍 Now listening on http://localhost:${PORT}/graphql`));
 }
