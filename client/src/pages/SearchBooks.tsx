@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
-import type { FormEvent } from 'react';
+import type { FormEvent, KeyboardEvent } from 'react';
 import { Button, Card, Col, Container, Form, Row } from 'react-bootstrap';
 import { useMutation } from '@apollo/client';
 import { SAVE_BOOK } from '../utils/mutations';
 import Auth from '../utils/auth';
-import { searchBooks } from '../utils/API';
+import { searchBooks, searchBookSuggestions } from '../utils/API';
+import type { BookSuggestion } from '../utils/API';
 import { getSavedBookIds, saveBookIds } from '../utils/localStorage';
 import type { Book } from '../models/Book';
 
@@ -14,6 +15,8 @@ const SearchBooks = () => {
   const [savedBookIds, setSavedBookIds] = useState<string[]>(getSavedBookIds());
   const [statusMessage, setStatusMessage] = useState('');
   const [isSearching, setIsSearching] = useState(false);
+  const [suggestions, setSuggestions] = useState<BookSuggestion[]>([]);
+  const [activeSuggestion, setActiveSuggestion] = useState(-1);
 
   const [saveBook] = useMutation(SAVE_BOOK);
 
@@ -21,10 +24,33 @@ const SearchBooks = () => {
     saveBookIds(savedBookIds);
   }, [savedBookIds]);
 
-  const handleFormSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
+  useEffect(() => {
     const query = searchInput.trim();
+    setActiveSuggestion(-1);
+
+    if (query.length < 2 || isSearching) {
+      setSuggestions([]);
+      return;
+    }
+
+    let cancelled = false;
+    const timer = window.setTimeout(async () => {
+      try {
+        const nextSuggestions = await searchBookSuggestions(query);
+        if (!cancelled) setSuggestions(nextSuggestions);
+      } catch {
+        if (!cancelled) setSuggestions([]);
+      }
+    }, 275);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [searchInput, isSearching]);
+
+  const performSearch = async (rawQuery: string) => {
+    const query = rawQuery.trim();
     if (!query) {
       setStatusMessage('Enter a title, author, or keyword to search.');
       return;
@@ -32,10 +58,11 @@ const SearchBooks = () => {
 
     setIsSearching(true);
     setStatusMessage('');
+    setSuggestions([]);
+    setActiveSuggestion(-1);
 
     try {
       const bookData = await searchBooks(query);
-
       setSearchedBooks(bookData);
       setSearchInput('');
 
@@ -48,6 +75,36 @@ const SearchBooks = () => {
       setStatusMessage('Unable to search books right now. Try again in a moment.');
     } finally {
       setIsSearching(false);
+    }
+  };
+
+  const handleFormSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    await performSearch(searchInput);
+  };
+
+  const handleSuggestionClick = async (suggestion: BookSuggestion) => {
+    setSearchInput(suggestion.title);
+    await performSearch(suggestion.query);
+  };
+
+  const handleSearchKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (suggestions.length === 0) return;
+
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      setActiveSuggestion((current) => (current + 1) % suggestions.length);
+    } else if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      setActiveSuggestion((current) =>
+        current <= 0 ? suggestions.length - 1 : current - 1
+      );
+    } else if (event.key === 'Enter' && activeSuggestion >= 0) {
+      event.preventDefault();
+      void handleSuggestionClick(suggestions[activeSuggestion]);
+    } else if (event.key === 'Escape') {
+      setSuggestions([]);
+      setActiveSuggestion(-1);
     }
   };
 
@@ -77,15 +134,37 @@ const SearchBooks = () => {
           <Form onSubmit={handleFormSubmit} className='book-search-form'>
             <Row className='g-3'>
               <Col xs={12} md={9}>
-                <Form.Control
-                  name='searchInput'
-                  value={searchInput}
-                  onChange={(e) => setSearchInput(e.target.value)}
-                  type='text'
-                  size='lg'
-                  placeholder='Search by title, author, or keyword'
-                  aria-label='Search books'
-                />
+                <div className='search-autocomplete'>
+                  <Form.Control
+                    name='searchInput'
+                    value={searchInput}
+                    onChange={(e) => setSearchInput(e.target.value)}
+                    onKeyDown={handleSearchKeyDown}
+                    onFocus={() => setActiveSuggestion(-1)}
+                    type='text'
+                    size='lg'
+                    placeholder='Search by title, author, or keyword'
+                    aria-label='Search books'
+                    autoComplete='off'
+                  />
+
+                  {suggestions.length > 0 ? (
+                    <div className='search-suggestions' role='listbox' aria-label='Book suggestions'>
+                      {suggestions.map((suggestion, index) => (
+                        <button
+                          type='button'
+                          key={`${suggestion.title}-${suggestion.author}-${index}`}
+                          className={`search-suggestion${index === activeSuggestion ? ' is-active' : ''}`}
+                          onMouseDown={(event) => event.preventDefault()}
+                          onClick={() => void handleSuggestionClick(suggestion)}
+                        >
+                          <span>{suggestion.title}</span>
+                          <small>{suggestion.author}</small>
+                        </button>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
               </Col>
               <Col xs={12} md={3}>
                 <Button type='submit' size='lg' className='w-100 primary-action' disabled={isSearching}>
