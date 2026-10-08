@@ -1,162 +1,161 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
-import {
-  Container,
-  Col,
-  Form,
-  Button,
-  Card,
-  Row
-} from 'react-bootstrap';
+import { Button, Card, Col, Container, Form, Row } from 'react-bootstrap';
 import { useMutation } from '@apollo/client';
 import { SAVE_BOOK } from '../utils/mutations';
 import Auth from '../utils/auth';
 import { searchGoogleBooks } from '../utils/API';
-import { saveBookIds, getSavedBookIds } from '../utils/localStorage';
+import { getSavedBookIds, saveBookIds } from '../utils/localStorage';
 import type { Book } from '../models/Book';
 import type { GoogleAPIBook } from '../models/GoogleAPIBook';
 
 const SearchBooks = () => {
-  // create state for holding returned google api data
   const [searchedBooks, setSearchedBooks] = useState<Book[]>([]);
-  // create state for holding our search field data
   const [searchInput, setSearchInput] = useState('');
+  const [savedBookIds, setSavedBookIds] = useState<string[]>(getSavedBookIds());
+  const [statusMessage, setStatusMessage] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
 
-  // create state to hold saved bookId values
-  const [savedBookIds, setSavedBookIds] = useState(getSavedBookIds());
+  const [saveBook] = useMutation(SAVE_BOOK);
 
-  const [saveBook, { error }] = useMutation(SAVE_BOOK);
-
-  // set up useEffect hook to save `savedBookIds` list to localStorage on component unmount
-  // learn more here: https://reactjs.org/docs/hooks-effect.html#effects-with-cleanup
   useEffect(() => {
-    return () => saveBookIds(savedBookIds);
-  });
+    saveBookIds(savedBookIds);
+  }, [savedBookIds]);
 
-// Todo: implement handleFormSubmit to prevent default, check searchInput, fetch books with searchGoogleBooks, handle errors, map API items to bookData, update searchedBooks state and clear input
-// Note logs the fetched ‘items’ and mapped ‘bookData’, defaults missing authors to ['No author to display'], picks thumbnail or empty string, then calls setSearchedBooks(bookData) and resets searchInput, with errors caught and logged
-
-
-  // create method to search for books and set state on form submit
   const handleFormSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (!searchInput) {
-      return false;
+    const query = searchInput.trim();
+    if (!query) {
+      setStatusMessage('Enter a title, author, or keyword to search.');
+      return;
     }
 
-    try {
-      const response = await searchGoogleBooks(searchInput);
+    setIsSearching(true);
+    setStatusMessage('');
 
+    try {
+      const response = await searchGoogleBooks(query);
       if (!response.ok) {
-        throw new Error('something went wrong!');
+        throw new Error('Google Books search failed.');
       }
 
-      const { items } = await response.json();
-      console.log("items: ", items);
+      const payload = await response.json();
+      const items: GoogleAPIBook[] = payload.items ?? [];
 
-      const bookData = items.map((book: GoogleAPIBook) => ({
+      const bookData: Book[] = items.map((book) => ({
         bookId: book.id,
-        authors: book.volumeInfo.authors || ['No author to display'],
-        title: book.volumeInfo.title,
-        description: book.volumeInfo.description,
+        authors: book.volumeInfo.authors || ['Unknown author'],
+        title: book.volumeInfo.title || 'Untitled',
+        description: book.volumeInfo.description || 'No description available.',
         image: book.volumeInfo.imageLinks?.thumbnail || '',
       }));
 
-      console.log("bookData: ", bookData);
-
       setSearchedBooks(bookData);
       setSearchInput('');
+
+      if (bookData.length === 0) {
+        setStatusMessage(`No books found for “${query}”.`);
+      }
     } catch (err) {
       console.error(err);
+      setSearchedBooks([]);
+      setStatusMessage('Unable to search Google Books right now. Try again in a moment.');
+    } finally {
+      setIsSearching(false);
     }
   };
 
-// Todo: implement handleSaveBook to locate book by 'bookId' in 'searchedBooks', retrieve auth token, call 'saveBook' mutation with { variables: { bookData: ... } }, and update 'savedBookIds'
-// Note finds 'bookToSave' via searchedBooks.find, gets token from Auth.loggedIn()/Auth.getToken(), returns false if no token, executes saveBook({ variables: { bookData } }), destructures { data }, appends bookToSave.bookId to savedBookIds, and logs errors
-
-
-  // create function to handle saving a book to our database
   const handleSaveBook = async (bookId: string) => {
-    // find the book in `searchedBooks` state by the matching id
-    const bookToSave: Book = searchedBooks.find((book) => book.bookId === bookId)!;
-
-    // get token
-    const token = Auth.loggedIn() ? Auth.getToken() : null;
-
-    if (!token) {
-      return false;
-    }
+    const bookToSave = searchedBooks.find((book) => book.bookId === bookId);
+    if (!bookToSave || !Auth.loggedIn()) return;
 
     try {
-     // const response = await saveBook(bookToSave, token);
-     // const { bookId, authors, description, image, title } = bookToSave;
-
-      const { data } = await saveBook({
-        variables: { bookData: { ...bookToSave } },
-      });
-      // if book successfully saves to user's account, save book id to state
-      setSavedBookIds([...savedBookIds, bookToSave.bookId]);
+      await saveBook({ variables: { bookData: { ...bookToSave } } });
+      setSavedBookIds((current) =>
+        current.includes(bookToSave.bookId) ? current : [...current, bookToSave.bookId]
+      );
     } catch (err) {
       console.error(err);
+      setStatusMessage('That book could not be saved. Please try again.');
     }
   };
 
   return (
     <>
-      <div className="text-light bg-dark p-5">
+      <section className='book-hero'>
         <Container>
-          <h1>Search for Books!</h1>
-          <Form onSubmit={handleFormSubmit}>
-            <Row>
-              <Col xs={12} md={8}>
+          <span className='eyebrow'>Google Books discovery</span>
+          <h1>Find your next read.</h1>
+          <p>Search millions of books, then save favorites to your personal shelf.</p>
+
+          <Form onSubmit={handleFormSubmit} className='book-search-form'>
+            <Row className='g-3'>
+              <Col xs={12} md={9}>
                 <Form.Control
                   name='searchInput'
                   value={searchInput}
                   onChange={(e) => setSearchInput(e.target.value)}
                   type='text'
                   size='lg'
-                  placeholder='Search for a book'
+                  placeholder='Search by title, author, or keyword'
+                  aria-label='Search books'
                 />
               </Col>
-              <Col xs={12} md={4}>
-                <Button type='submit' variant='success' size='lg'>
-                  Submit Search
+              <Col xs={12} md={3}>
+                <Button type='submit' size='lg' className='w-100 primary-action' disabled={isSearching}>
+                  {isSearching ? 'Searching…' : 'Search Books'}
                 </Button>
               </Col>
             </Row>
           </Form>
         </Container>
-      </div>
+      </section>
 
-      <Container>
-        <h2 className='pt-5'>
-          {searchedBooks.length
-            ? `Viewing ${searchedBooks.length} results:`
-            : 'Search for a book to begin'}
-        </h2>
-        <Row>
+      <Container className='results-section'>
+        <div className='section-heading'>
+          <div>
+            <span className='eyebrow'>Results</span>
+            <h2>
+              {searchedBooks.length
+                ? `${searchedBooks.length} ${searchedBooks.length === 1 ? 'book' : 'books'} found`
+                : 'Search to explore books'}
+            </h2>
+          </div>
+          {!Auth.loggedIn() && searchedBooks.length > 0 ? (
+            <span className='helper-text'>Log in to save books to your shelf.</span>
+          ) : null}
+        </div>
+
+        {statusMessage ? <div className='status-message'>{statusMessage}</div> : null}
+
+        <Row className='g-4'>
           {searchedBooks.map((book) => {
+            const isSaved = savedBookIds.includes(book.bookId);
+
             return (
-              <Col md="4" key={book.bookId}>
-                <Card border='dark'>
-                  {book.image ? (
-                    <Card.Img src={book.image} alt={`The cover for ${book.title}`} variant='top' />
-                  ) : null}
-                  <Card.Body>
-                    <Card.Title>{book.title}</Card.Title>
-                    <p className='small'>Authors: {book.authors}</p>
-                    <Card.Text>{book.description}</Card.Text>
-                    {Auth.loggedIn() && (
-                      <Button
-                        disabled={savedBookIds?.some((savedBookId: string) => savedBookId === book.bookId)}
-                        className='btn-block btn-info'
-                        onClick={() => handleSaveBook(book.bookId)}>
-                        {savedBookIds?.some((savedBookId: string) => savedBookId === book.bookId)
-                          ? 'This book has already been saved!'
-                          : 'Save this Book!'}
-                      </Button>
+              <Col sm={12} md={6} lg={4} key={book.bookId}>
+                <Card className='book-card h-100'>
+                  <div className='book-cover-wrap'>
+                    {book.image ? (
+                      <Card.Img src={book.image} alt={`Cover for ${book.title}`} className='book-cover' />
+                    ) : (
+                      <div className='book-cover-placeholder'>No cover</div>
                     )}
+                  </div>
+                  <Card.Body className='d-flex flex-column'>
+                    <Card.Title>{book.title}</Card.Title>
+                    <p className='book-authors'>{book.authors.join(', ')}</p>
+                    <Card.Text className='book-description'>{book.description}</Card.Text>
+                    {Auth.loggedIn() ? (
+                      <Button
+                        disabled={isSaved}
+                        className='mt-auto save-button'
+                        onClick={() => void handleSaveBook(book.bookId)}
+                      >
+                        {isSaved ? 'Saved' : 'Save to My Books'}
+                      </Button>
+                    ) : null}
                   </Card.Body>
                 </Card>
               </Col>
