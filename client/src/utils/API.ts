@@ -70,6 +70,12 @@ type OpenLibraryDoc = {
   first_sentence?: string | string[];
 };
 
+export type BookSuggestion = {
+  title: string;
+  author: string;
+  query: string;
+};
+
 const normalizeGoogleBooks = (items: GoogleVolume[] = []): Book[] =>
   items.map((book) => ({
     bookId: book.id,
@@ -95,7 +101,7 @@ export const searchBooks = async (query: string): Promise<Book[]> => {
 
   try {
     const googleResponse = await fetch(
-      `https://www.googleapis.com/books/v1/volumes?q=${encodedQuery}&maxResults=12`
+      `https://www.googleapis.com/books/v1/volumes?q=${encodedQuery}&maxResults=30`
     );
 
     if (googleResponse.ok) {
@@ -108,7 +114,7 @@ export const searchBooks = async (query: string): Promise<Book[]> => {
   }
 
   const openLibraryResponse = await fetch(
-    `https://openlibrary.org/search.json?q=${encodedQuery}&limit=12&fields=key,title,author_name,cover_i,first_sentence`
+    `https://openlibrary.org/search.json?q=${encodedQuery}&limit=30&fields=key,title,author_name,cover_i,first_sentence`
   );
 
   if (!openLibraryResponse.ok) {
@@ -117,4 +123,38 @@ export const searchBooks = async (query: string): Promise<Book[]> => {
 
   const payload = await openLibraryResponse.json();
   return normalizeOpenLibrary(payload.docs ?? []);
+};
+
+export const searchBookSuggestions = async (query: string): Promise<BookSuggestion[]> => {
+  const trimmedQuery = query.trim();
+  if (trimmedQuery.length < 2) return [];
+
+  const encodedQuery = encodeURIComponent(trimmedQuery);
+  const response = await fetch(
+    `https://openlibrary.org/search.json?q=${encodedQuery}&limit=10&fields=title,author_name`
+  );
+
+  if (!response.ok) return [];
+
+  const payload = await response.json();
+  const docs: OpenLibraryDoc[] = payload.docs ?? [];
+  const seen = new Set<string>();
+
+  return docs.reduce<BookSuggestion[]>((suggestions, doc) => {
+    const title = doc.title?.trim();
+    if (!title) return suggestions;
+
+    const author = doc.author_name?.[0]?.trim() || 'Unknown author';
+    const key = `${title.toLowerCase()}|${author.toLowerCase()}`;
+    if (seen.has(key)) return suggestions;
+
+    seen.add(key);
+    suggestions.push({
+      title,
+      author,
+      query: author === 'Unknown author' ? title : `${title} ${author}`,
+    });
+
+    return suggestions.length < 7 ? suggestions : suggestions;
+  }, []).slice(0, 7);
 };
