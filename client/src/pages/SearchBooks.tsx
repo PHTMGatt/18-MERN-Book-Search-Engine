@@ -4,10 +4,9 @@ import { Button, Card, Col, Container, Form, Row } from 'react-bootstrap';
 import { useMutation } from '@apollo/client';
 import { SAVE_BOOK } from '../utils/mutations';
 import Auth from '../utils/auth';
-import { searchGoogleBooks } from '../utils/API';
+import { searchBooks } from '../utils/API';
 import { getSavedBookIds, saveBookIds } from '../utils/localStorage';
 import type { Book } from '../models/Book';
-import type { GoogleAPIBook } from '../models/GoogleAPIBook';
 
 const SearchBooks = () => {
   const [searchedBooks, setSearchedBooks] = useState<Book[]>([]);
@@ -35,21 +34,7 @@ const SearchBooks = () => {
     setStatusMessage('');
 
     try {
-      const response = await searchGoogleBooks(query);
-      if (!response.ok) {
-        throw new Error('Google Books search failed.');
-      }
-
-      const payload = await response.json();
-      const items: GoogleAPIBook[] = payload.items ?? [];
-
-      const bookData: Book[] = items.map((book) => ({
-        bookId: book.id,
-        authors: book.volumeInfo.authors || ['Unknown author'],
-        title: book.volumeInfo.title || 'Untitled',
-        description: book.volumeInfo.description || 'No description available.',
-        image: book.volumeInfo.imageLinks?.thumbnail || '',
-      }));
+      const bookData = await searchBooks(query);
 
       setSearchedBooks(bookData);
       setSearchInput('');
@@ -60,7 +45,7 @@ const SearchBooks = () => {
     } catch (err) {
       console.error(err);
       setSearchedBooks([]);
-      setStatusMessage('Unable to search Google Books right now. Try again in a moment.');
+      setStatusMessage('Unable to search books right now. Try again in a moment.');
     } finally {
       setIsSearching(false);
     }
@@ -85,7 +70,7 @@ const SearchBooks = () => {
     <>
       <section className='book-hero'>
         <Container>
-          <span className='eyebrow'>Google Books discovery</span>
+          <span className='eyebrow'>Book discovery</span>
           <h1>Find your next read.</h1>
           <p>Search millions of books, then save favorites to your personal shelf.</p>
 
