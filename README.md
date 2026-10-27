@@ -10,7 +10,7 @@
 - **Live Demo:** https://one8-mern-book-search-engine.onrender.com
 - **GitHub Repo:** https://github.com/PHTMGatt/18-MERN-Book-Search-Engine 
 
-![BookFinder search results for "Dune"](docs/portfolio/cover.webp)
+![BookFinder search results for "Dune"](https://raw.githubusercontent.com/PHTMGatt/12-React-Portfolio/main/src/assets/photos/Mern%20Book.png)
 
 
 
