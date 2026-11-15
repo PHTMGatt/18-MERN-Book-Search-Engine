@@ -12,7 +12,6 @@
   "dependencies": {
     "@apollo/client": "^3.13.8",
     "@types/bcrypt": "^5.0.2",
-    "@vitejs/plugin-react": "^4.7.0",
     "bootstrap": "^5.2.3",
     "client": "file:",
     "graphql": "^16.11.0",
@@ -20,15 +19,16 @@
     "react": "^19.3.1",
     "react-bootstrap": "^2.7.4",
     "react-dom": "^19.3.1",
-    "react-router-dom": "^7.18.5",
-    "vite": "^7.3.8"
+    "react-router-dom": "^7.18.5"
   },
   "devDependencies": {
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.3.0",
     "eslint": "^8.38.0",
     "eslint-plugin-react": "^7.32.2",
     "eslint-plugin-react-hooks": "^4.6.0",
-    "eslint-plugin-react-refresh": "^0.3.4"
+    "eslint-plugin-react-refresh": "^0.3.4",
+    "vite": "^8.3.8"
   }
 }
