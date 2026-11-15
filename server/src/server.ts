@@ -7,7 +7,7 @@ import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 //import routes from './routes/index.js';
-import { expressMiddleware } from '@as-integrations/express4';
+import { expressMiddleware } from '@as-integrations/express5';
 import { typeDefs, resolvers } from './schemas/index.js';
 import { authenticateToken } from './services/auth.js';
 
@@ -40,7 +40,7 @@ const startApolloServer = async () => {
   if (process.env.NODE_ENV === 'production') {
     app.use(express.static(path.join(__dirname, '../../client/dist')));
 
-    app.get('*', (_req: Request, res: Response) => {
+    app.get('/{*splat}', (_req: Request, res: Response) => {
       res.sendFile(path.join(__dirname, '../../client/dist/index.html'));
     });
   }
