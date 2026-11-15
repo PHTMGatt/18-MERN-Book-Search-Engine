@@ -21,7 +21,7 @@
 
 | Layer      | Technology                        |
 | ---------- | --------------------------------- |
-| Front‑end  | React, Apollo Client, TypeScript  |
+| Front‑end  | React, Apollo Client, TypeScript, Vite |
 | Back‑end   | Node.js, Express.js, Apollo Server|
 | Database   | MongoDB Atlas, Mongoose           |
 | Auth       | JWT, Context Middleware           |
@@ -38,6 +38,48 @@
 - **Apollo Client** — attaches token via `authLink` middleware  
 - **Responsive UI** — modern React interface with modal forms  
 - **Deployed** — live on Render backed by MongoDB Atlas  
+
+---
+
+## 🚀 Getting Started
+
+Requires **Node.js 22+** and a MongoDB database (local `mongod` or an Atlas URI). The Google Books search needs no API key.
+
+```bash
+git clone https://github.com/PHTMGatt/18-MERN-Book-Search-Engine.git
+cd 18-MERN-Book-Search-Engine
+npm install        # its install script also installs server/ and client/
+```
+
+### Environment variables
+
+| Variable | Used for | Default |
+| --- | --- | --- |
+| `JWT_SECRET_KEY` | Signing login tokens (required for signup/login) | none |
+| `MONGODB_URI` | MongoDB connection string | `mongodb://127.0.0.1:27017/googlebooks` |
+| `PORT` | Server port | `3001` |
+| `NODE_ENV` | Set to `production` to serve `client/dist` from Express | unset |
+
+Put `JWT_SECRET_KEY` in `server/.env`. Set `MONGODB_URI` in your shell or host environment (as Render does): the server connects to MongoDB before it loads `server/.env`, so a `MONGODB_URI` in that file is ignored. Without it, the server uses the local default.
+
+### Run
+
+**Development** (server on 3001, Vite on http://localhost:3000 with `/graphql` proxied):
+
+```bash
+npm run dev        # builds once, then runs the server (nodemon) and Vite together
+```
+
+**Production-style** (one server):
+
+```bash
+npm run build
+NODE_ENV=production npm start   # app + GraphQL at http://localhost:3001
+```
+
+On Windows PowerShell, use `$env:NODE_ENV="production"; npm start`. Render runs `npm run render-build`, then `npm start`.
+
+There is no test suite. CI (`security-low`) runs a secrets scan, `npm audit` and the build on every pull request.
 
 ---
 
