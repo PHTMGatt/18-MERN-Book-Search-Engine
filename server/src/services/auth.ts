@@ -2,7 +2,7 @@ import type { Request } from 'express';
 import jwt from 'jsonwebtoken';
 
 import dotenv from 'dotenv';
-dotenv.config();
+dotenv.config({ quiet: true });
 
 interface JwtPayload {
   _id: unknown;

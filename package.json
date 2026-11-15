@@ -15,7 +15,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "concurrently": "^8.2.0"
+    "concurrently": "^10.0.7"
   },
   "dependencies": {
     "googlebooks-app": "file:"

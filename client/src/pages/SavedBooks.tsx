@@ -1,5 +1,5 @@
 import { Button, Card, Col, Container, Row } from 'react-bootstrap';
-import { useMutation, useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client/react';
 import { DELETE_BOOK } from '../utils/mutations';
 import { GET_ME } from '../utils/queries';
 import Auth from '../utils/auth';
