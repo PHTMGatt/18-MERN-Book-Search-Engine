@@ -1,20 +1,16 @@
 import './App.css';
-import {
-  ApolloClient,
-  InMemoryCache,
-  ApolloProvider,
-  createHttpLink,
-} from '@apollo/client';
-import { setContext } from '@apollo/client/link/context';
+import { ApolloClient, InMemoryCache, HttpLink } from '@apollo/client';
+import { SetContextLink } from '@apollo/client/link/context';
+import { ApolloProvider } from '@apollo/client/react';
 import { Outlet } from 'react-router-dom';
 
 import Navbar from './components/Navbar';
 
-const httpLink = createHttpLink({
+const httpLink = new HttpLink({
   uri: '/graphql',
 });
 
-const authLink = setContext((_, { headers }) => {
+const authLink = new SetContextLink(({ headers }) => {
   const token = localStorage.getItem('id_token');
 
   return {

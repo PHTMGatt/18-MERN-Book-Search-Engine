@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { FormEvent, KeyboardEvent } from 'react';
 import { Button, Card, Col, Container, Form, Row } from 'react-bootstrap';
-import { useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client/react';
 import { SAVE_BOOK } from '../utils/mutations';
 import Auth from '../utils/auth';
 import { searchBooks, searchBookSuggestions } from '../utils/API';

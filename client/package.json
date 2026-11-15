@@ -10,7 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@apollo/client": "^3.13.8",
+    "@apollo/client": "^4.3.8",
     "@types/bcrypt": "^5.0.2",
     "bootstrap": "^5.2.3",
     "client": "file:",
@@ -19,7 +19,8 @@
     "react": "^19.3.1",
     "react-bootstrap": "^2.7.4",
     "react-dom": "^19.3.1",
-    "react-router-dom": "^7.18.5"
+    "react-router-dom": "^7.18.5",
+    "rxjs": "^7.8.2"
   },
   "devDependencies": {
     "@types/react": "^19.3.0",
