@@ -1,7 +1,11 @@
-# 📚 MERN Book Search Engine
+# BookFinder: MERN Book Search Engine
 
 > A GraphQL‑powered Google Books search & personal library app built on the MERN stack.  
 > Search for books, sign up/log in, save favorites, and manage your reading list—all deployed on Render with MongoDB Atlas.
+
+[![Live demo](https://img.shields.io/badge/live%20demo-online-2ea44f)](https://one8-mern-book-search-engine.onrender.com)
+
+![BookFinder home page with book search](docs/screenshot.png)
 
 ---
 
@@ -10,7 +14,6 @@
 - **Live Demo:** https://one8-mern-book-search-engine.onrender.com
 - **GitHub Repo:** https://github.com/PHTMGatt/18-MERN-Book-Search-Engine 
 
-![BookFinder search results for "Dune"](https://raw.githubusercontent.com/PHTMGatt/12-React-Portfolio/main/src/assets/photos/Mern%20Book.png)
 
 
 
