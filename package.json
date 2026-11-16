@@ -6,9 +6,9 @@
   "scripts": {
     "start": "cd server && npm run start",
     "develop": "concurrently \"cd server && npm run watch\" \"cd client && npm run dev\"",
-    "install": "cd server && npm i && cd ../client && npm i",
+    "install": "cd server && npm i --include=dev && cd ../client && npm i --include=dev",
     "build": "concurrently \"cd server && npm run build\" \"cd client && npm run build\"",
-    "render-build": "npm install && npm run build",
+    "render-build": "npm install --include=dev && npm run build",
     "dev": "npm run build && npm run develop"
   },
   "keywords": [],
